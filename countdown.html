@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Countdown</title>
+  <style>
+    body {
+      background: #000;
+      color: white;
+      font-size: 48px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+  <div id="countdown">Loading...</div>
+
+  <script>
+    // カウントダウンの目標日時（UTCを使うと安全にゃ）
+    const targetDate = new Date('2025-06-01T03:00:00Z'); // 日本時間 12:00 に対応
+
+    function updateCountdown() {
+      const now = new Date();
+      const diff = targetDate - now;
+
+      if (diff <= 0) {
+        document.getElementById('countdown').textContent = 'Time\'s up!';
+        clearInterval(timer);
+        return;
+      }
+
+      const hours = Math.floor(diff / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+      document.getElementById('countdown').textContent =
+        `${hours}時間 ${minutes}分 ${seconds}秒`;
+    }
+
+    const timer = setInterval(updateCountdown, 1000);
+    updateCountdown(); // 最初に1回呼ぶ
+  </script>
+</body>
+</html>
