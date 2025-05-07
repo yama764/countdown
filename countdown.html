@@ -2,47 +2,67 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Countdown</title>
+  <title>カウントダウン</title>
   <style>
     body {
-      background: #000;
+      background: black;
       color: white;
-      font-size: 48px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
+      font-size: 3em;
+      text-align: center;
+      padding-top: 20%;
+      font-family: sans-serif;
     }
   </style>
 </head>
 <body>
-  <div id="countdown">Loading...</div>
+  <div id="countdown">読み込み中にゃ…</div>
 
   <script>
-    // カウントダウンの目標日時（UTCを使うと安全にゃ）
-    const targetDate = new Date('2025-06-01T03:00:00Z'); // 日本時間 12:00 に対応
+    const sheetURL = 'https://opensheet.vercel.app/1d5YFB43Ba4eadPJr_TyVWzqetEe3Ga-rsSWUzorFl5k/Sheet1';
 
-    function updateCountdown() {
-      const now = new Date();
-      const diff = targetDate - now;
+    async function fetchSchedule() {
+      const res = await fetch(sheetURL);
+      const schedule = await res.json();
 
-      if (diff <= 0) {
-        document.getElementById('countdown').textContent = 'Time\'s up!';
-        clearInterval(timer);
-        return;
+      const today = new Date().toISOString().slice(0, 10); // 2025-06-01
+      const todayEntry = schedule.find(row => row.date === today);
+
+      if (!todayEntry) {
+        document.getElementById('countdown').textContent = '本日のスケジュールはにゃいにゃ';
+        return null;
       }
 
-      const hours = Math.floor(diff / (1000 * 60 * 60));
-      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-
-      document.getElementById('countdown').textContent =
-        `${hours}時間 ${minutes}分 ${seconds}秒`;
+      return new Date(`${today}T${todayEntry.time}+09:00`); // 日本時間
     }
 
-    const timer = setInterval(updateCountdown, 1000);
-    updateCountdown(); // 最初に1回呼ぶ
+    async function startCountdown() {
+      const target = await fetchSchedule();
+      if (!target) return;
+
+      const countdownEl = document.getElementById('countdown');
+
+      function updateCountdown() {
+        const now = new Date();
+        const diff = target - now;
+
+        if (diff <= 0) {
+          countdownEl.textContent = 'にゃ〜！時間にゃ！';
+          clearInterval(timer);
+          return;
+        }
+
+        const h = Math.floor(diff / (1000 * 60 * 60));
+        const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const s = Math.floor((diff % (1000 * 60)) / 1000);
+
+        countdownEl.textContent = `${h}時間 ${m}分 ${s}秒`;
+      }
+
+      const timer = setInterval(updateCountdown, 1000);
+      updateCountdown();
+    }
+
+    startCountdown();
   </script>
 </body>
 </html>
