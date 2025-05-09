@@ -60,6 +60,7 @@
         const diff = target - now;
 
         if (diff <= 0) {
+          document.getElementById('label').textContent = ''
           countdownEl.textContent = '撤退！！';
           clearInterval(timer);
           return;
